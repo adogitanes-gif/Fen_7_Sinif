@@ -137,12 +137,15 @@ Object.assign(OPS,{
 });
 
 /* ================= Sırala: put the steps in order ================= */
+/* the 7 colours of white light through a prism (Fen 4. ünite): show a real colour dot before the name */
+const SPECTRUM={'Kırmızı':'#e53935','Turuncu':'#fb8c00','Sarı':'#fdd835','Yeşil':'#43a047','Mavi':'#1e88e5','Lacivert':'#283593','Mor':'#8e24aa'};
+const oText=t=>(SPECTRUM[t]?`<i class="sdot" style="background:${SPECTRUM[t]}" aria-hidden="true"></i>`:'')+esc(t);
 function orderHTML(q){let it;do{it=shuffle(q.items)}while(it.every((x,i)=>x===q.items[i]));q.pool=it;q.pick=[];
   return `<p class="hint">Doğru sırayla dokun. Yanlış koyduğuna dokunursan geri çıkar.</p><ol class="oslots" id="oslots"></ol><div class="opool" id="opool"></div>
     <div class="row"><button class="go" id="chk" type="button" disabled>Kontrol et</button><button class="go alt" id="clr" type="button">Temizle</button></div>`}
 function setupOrder(){const q=S.q,slots=document.getElementById('oslots'),pool=document.getElementById('opool'),chk=document.getElementById('chk');
-  const draw=()=>{slots.innerHTML=q.items.map((_,i)=>{const t=q.pick[i];return `<li class="oslot${t!=null?' full':''}"><span class="on">${i+1}</span>${t!=null?`<button class="oitem" type="button" data-back="${i}"><span class="ot">${esc(t)}</span></button>`:'<span class="oe">…</span>'}</li>`}).join('');
-    pool.innerHTML=q.pool.map((t,i)=>q.pick.includes(t)?'':`<button class="oitem" type="button" data-i="${i}"><span class="ot">${esc(t)}</span></button>`).join('');
+  const draw=()=>{slots.innerHTML=q.items.map((_,i)=>{const t=q.pick[i];return `<li class="oslot${t!=null?' full':''}"><span class="on">${i+1}</span>${t!=null?`<button class="oitem" type="button" data-back="${i}"><span class="ot">${oText(t)}</span></button>`:'<span class="oe">…</span>'}</li>`}).join('');
+    pool.innerHTML=q.pool.map((t,i)=>q.pick.includes(t)?'':`<button class="oitem" type="button" data-i="${i}"><span class="ot">${oText(t)}</span></button>`).join('');
     chk.disabled=q.pick.length!==q.items.length;
     pool.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{if(S.done)return;q.pick.push(q.pool[+b.dataset.i]);sfx('tick');draw();if(PAD.on)(pool.querySelector('button')||chk).focus({preventScroll:true})});
     slots.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{if(S.done)return;q.pick.splice(+b.dataset.back,1);sfx('flip');draw()})};
